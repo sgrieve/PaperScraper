@@ -2,6 +2,7 @@ import requests
 import slate
 import os
 import sys
+import string
 
 
 def LoadToken(FileName):
@@ -60,6 +61,17 @@ def DownloadPaper(doi, Token, Outpath):
         f.write(fulltext.content)
 
 
+def StripText(text):
+    '''
+    Remove all punctuation and digits from raw text aside from periods, which
+    are needed to identify sentence breaks.
+    '''
+
+    TransTable = string.maketrans('', '')
+    Replacement = string.punctuation.replace('.', '') + string.digits
+    return text.translate(TransTable, Replacement)
+
+
 def ExtractText(doi, pdfPath, txtPath):
     '''
     Extract raw text from downloaded pdf and save as a txt file.
@@ -72,7 +84,7 @@ def ExtractText(doi, pdfPath, txtPath):
 
     with open('{0}{1}.txt'.format(txtPath, doi), 'w') as w:
         for page in paper:
-            w.write(page)
+            w.write(StripText(page))
 
 
 def Core(dois, pdfPath, txtPath):
